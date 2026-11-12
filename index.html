@@ -6,13 +6,22 @@
 <meta name="theme-color" content="#002f82">
 <meta name="description" content="일산동고등학교 수험생에게 보내는 따뜻한 마음, 수능 응원 우체통">
 <title>일산동고등학교 · 수능 응원 우체통</title>
+<link rel="canonical" href="https://lingus12.github.io/isdh_suneung2027/">
+<link rel="icon" href="./school-logo.png" type="image/png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="일산동고등학교 · 수능 응원 우체통">
+<meta property="og:description" content="너의 모든 날을, 일산동고가 응원해. 선생님·후배·학부모의 따뜻한 편지를 만나 보세요.">
+<meta property="og:url" content="https://lingus12.github.io/isdh_suneung2027/">
+<meta property="og:image" content="https://lingus12.github.io/isdh_suneung2027/school-logo.png">
+<link rel="stylesheet" href="./assets/fonts.css">
+<link rel="preload" href="./assets/cheer-students.webp" as="image">
 
 <!--
 원본 기획·Google Apps Script: dossamlab / suneung-cheer-kit
 https://github.com/dossamlab/suneung-cheer-kit
 
-이 화면과 CSV 표시 코드는 사용자 요청에 따라 별도로 작성했습니다.
-AI 제작 보조.
+일산동고 맞춤 기획·추가 개발: 일산동고 최진영
+AI 제작 보조. 학교 맞춤 화면·모바일 경험·데이터 표시 기능을 개선했습니다.
 
 기존 window.SCHOOL 설정과 from,text,type,group CSV 형식을 사용합니다.
 Apps Script는 수정하지 않습니다.
@@ -913,7 +922,7 @@ noscript p {
 }
 
 @media (max-width: 850px) {
-  nav > a:not(.btn) { display: none; }
+  header nav > a:not(.btn) { display: none; }
   .hero { gap: 18px; }
   .hero h1 { font-size: 39px; }
   .art { height: 355px; }
@@ -985,6 +994,7 @@ noscript p {
   html { scroll-behavior: auto; }
 }
 </style>
+<link rel="stylesheet" href="./assets/site.css">
 </head>
 
 <body>
@@ -1054,31 +1064,12 @@ noscript p {
       </p>
     </div>
 
-    <div class="art" aria-hidden="true">
-      <div class="orbit"></div>
-
-      <div class="paper">
-        <small>TO. 우리의 빛나는 수험생에게 🍀</small>
-        <p>
-          네가 쌓아 온<br>
-          모든 순간을,<br>
-          <em>믿어.</em>
-        </p>
-      </div>
-
-      <div class="envelope">
-        <span class="seal">♡</span>
-        <span class="envelope-label">WITH LOVE, ILSANDONG</span>
-      </div>
-
-      <div class="sticker">
-        <small>오늘도, 내일도</small>
-        <strong>우린 네 편</strong>
-      </div>
-
-      <span class="spark">✧</span>
-      <span class="clover">🍀</span>
-    </div>
+    <figure class="hero-visual">
+      <div class="visual-halo" aria-hidden="true"></div>
+      <img src="./assets/cheer-students.webp" width="960" height="960"
+        alt="편지와 클로버를 들고 응원하는 고등학생 두 명과 클로버 친구" fetchpriority="high" decoding="async">
+      <figcaption><span aria-hidden="true">🍀</span> 여기까지 온 너, 정말 잘해 왔어.</figcaption>
+    </figure>
   </section>
 
   <div class="wrap ribbon">
@@ -1210,7 +1201,7 @@ noscript p {
 
       <p class="footnote">
         담당 선생님이 확인한 편지만 표시됩니다.
-        새 편지는 게시 반영에 시간이 걸릴 수 있어요.
+        체크한 편지는 Google 게시 갱신까지 보통 5~10분이 걸릴 수 있어요.
       </p>
     </div>
   </section>
@@ -1287,6 +1278,12 @@ noscript p {
     </div>
   </section>
 
+  <section class="wrap resources" id="resources" hidden aria-labelledby="resources-title">
+    <p class="eyebrow">FOR EXAM DAY</p>
+    <h2 id="resources-title">수험생 안내, 한눈에.</h2>
+    <p>학교에서 배부한 자료와 안내 영상을 확인해 주세요.</p>
+    <div class="resource-grid" id="resource-grid"></div>
+  </section>
   <section class="wrap faq" aria-labelledby="faq-title">
     <h2 id="faq-title">응원은 이렇게 전해져요.</h2>
 
@@ -1295,7 +1292,8 @@ noscript p {
       <p>
         구글 설문으로 보낸 편지는 담당 선생님이 확인합니다.
         응답 시트에서 ‘반영’에 체크한 편지만 공개용 데이터에 포함돼요.
-        아직 보이지 않는다면 검토 또는 게시 반영을 기다리고 있을 수 있습니다.
+        체크 후 Google 게시 갱신까지 보통 5~10분이 걸릴 수 있어요.
+        화면은 1분마다 자동으로 다시 확인합니다.
       </p>
     </details>
 
@@ -1331,17 +1329,36 @@ noscript p {
       </p>
     </details>
   </section>
+  <section class="wrap share-kit" id="share-kit" aria-labelledby="share-title">
+    <div>
+      <p class="eyebrow">03 · PASS THE WARMTH</p>
+      <h2 id="share-title">응원도, 이 주소도 함께 나눠요.</h2>
+      <p>교실 게시판에 붙이거나, 친구와 가족에게 전해 주세요.<br>QR을 찍으면 일산동고 수능 응원 우체통으로 바로 연결돼요.</p>
+      <div class="actions">
+        <a class="btn" href="./downloads/isdh-cheer-qr.png" download="일산동고_수능응원_QR.png">QR 이미지 받기 ↓</a>
+        <a class="btn light" href="./downloads/isdh-cheer-poster.html" target="_blank" rel="noopener">A4 배포 안내문 ↗</a>
+        <a class="qr-svg" href="./downloads/isdh-cheer-qr.svg" download="일산동고_수능응원_QR.svg">인쇄용 SVG</a>
+      </div>
+    </div>
+    <figure class="qr-card">
+      <img src="./downloads/isdh-cheer-qr.svg" width="172" height="172" loading="lazy" alt="일산동고 수능 응원 우체통 바로가기 QR 코드">
+      <figcaption>따뜻한 마음, 한 통 보내기 💌</figcaption>
+    </figure>
+  </section>
 </main>
+<nav class="mobile-nav" aria-label="휴대전화 빠른 메뉴">
+  <a href="#wall"><span aria-hidden="true">💌</span> 편지 읽기</a>
+  <a class="form-link mobile-write" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">✏️</span> 응원 쓰기</a>
+  <a href="#prepare"><span aria-hidden="true">🎒</span> 마지막 준비</a>
+</nav>
 
 <footer>
   <div class="wrap">
     <div class="footer-top">
       <div>
         <strong data-school>일산동고등학교</strong>
-        <small>
-          정진 · 창의 · 봉공<br>
-          너의 모든 날을 응원하는 우리의 작은 우체통.
-        </small>
+        <p class="school-motto">정진 · 창의 · 봉공</p>
+        <small>너의 모든 날을 응원하는 우리의 작은 우체통.</small>
       </div>
 
       <button class="btn" type="button" id="share">
@@ -1356,7 +1373,7 @@ noscript p {
         target="_blank"
         rel="noopener noreferrer"
       >dossamlab / suneung-cheer-kit</a><br>
-      학교 맞춤 화면·데이터 표시 코드는 별도로 작성했습니다.
+      일산동고 맞춤 기획·추가 개발: <strong>일산동고 최진영</strong>
       · AI 제작 보조<br>
       학교 마크: 사용자 제공.
       원저작물과 학교 마크의 관련 권리를 존중합니다.
@@ -2028,6 +2045,37 @@ noscript p {
 
       updateProgress();
     });
+  });
+
+  /* 담당자가 config.js에 지정한 안내 자료만 표시합니다. */
+  const resourceList = Array.isArray(cfg.resources) ? cfg.resources : [];
+  resourceList.forEach(item => {
+    if (!item || !item.url || !item.title) return;
+    let url;
+    try {
+      url = new URL(item.url, location.href);
+      if (!['https:', 'http:'].includes(url.protocol)) return;
+      if (url.protocol === 'http:' && url.origin !== location.origin) return;
+    } catch { return; }
+    const card = el('article', 'resource-card');
+    const title = el('h3', '', String(item.title));
+    card.append(title);
+    if (item.kind === 'video' && /\.(mp4|webm)(?:$|[?#])/i.test(url.href)) {
+      const video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'none';
+      video.playsInline = true;
+      video.src = url.href;
+      video.setAttribute('aria-label', String(item.title));
+      card.append(video);
+    }
+    const link = el('a', 'btn light', item.kind === 'video' ? '안내 영상 열기 ↗' : '안내 자료 열기 ↗');
+    link.href = url.href;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    card.append(link);
+    $('#resource-grid').append(card);
+    $('#resources').hidden = false;
   });
 
   /* 페이지 주소 복사 */

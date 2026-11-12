@@ -1,0 +1,39 @@
+일산동고등학교 수능 응원 우체통 운영 메모
+현재 사이트: https://lingus12.github.io/isdh_suneung2027/
+
+일상 운영
+1. 기존 Google 설문으로 편지를 받습니다.
+2. 지정 응답 시트에서 내용을 읽고 '반영'을 체크합니다.
+3. 공개용 탭에는 체크한 행만 출력되며, Google 게시 CSV는 갱신에 보통 5~10분이 걸릴 수 있습니다.
+4. 사이트는 화면이 열려 있을 때 1분마다 자동 확인합니다.
+5. GitHub나 Apps Script를 편지마다 다시 수정하거나 실행할 필요가 없습니다.
+
+2026-11-12 복구
+공개용!A1 수식이 응답 3행부터 읽어 첫 응답(2행)을 누락했습니다.
+참조를 INDIRECT로 감싼 2행부터 끝까지의 범위로 바꾸어 행 추가 시 시작점이 밀리는 문제와 1000행 제한을 보완했습니다.
+반영=TRUE 조건과 from,text,type,group 형식은 유지했습니다.
+원본 Apps Script와 설문은 변경하지 않았습니다.
+
+안내 자료 추가
+공개해도 되는 최종 PDF·MP4를 한 폴더에 모아 경로를 알려주면 됩니다.
+사이트 자료는 materials/ 아래에 올린 뒤 config.js의 resources 배열에 제목·종류·주소를 추가합니다.
+예: {title: "수험생 유의사항", kind: "pdf", url: "./materials/guide.pdf"}
+예: {title: "수험생 안내 영상", kind: "video", url: "공개 영상 주소"}
+MP4/WebM 파일은 페이지 안에서 재생하며, 다른 영상 링크는 새 탭에서 열립니다.
+resources가 비어 있으면 학생 화면에는 미완성 안내 영역을 표시하지 않습니다.
+큰 영상은 YouTube의 일부 공개 등 재생 가능한 영상 링크를 쓰면 모바일 데이터 부담을 줄일 수 있습니다.
+
+배포
+downloads/isdh-cheer-qr.png: 고해상도 QR(2460px, 300dpi)
+downloads/isdh-cheer-qr.svg: 인쇄용 벡터 QR
+downloads/isdh-cheer-poster.html: A4 배포 안내문. 브라우저 인쇄에서 A4, 배율 100%, 머리글/바닥글 끄기.
+QR은 정적 사이트의 현재 주소를 직접 담아 추적·가입·유료 QR 서비스가 필요 없습니다.
+
+글꼴과 제작 표시
+기기에 설치된 KoPubWorld를 우선 사용하고, 없으면 자체 호스팅 Paperlogy를 사용합니다.
+Paperlogy 원본과 OFL은 assets/fonts/에 함께 보관했습니다.
+원본 기획·Apps Script: dossamlab / suneung-cheer-kit (https://github.com/dossamlab/suneung-cheer-kit)
+일산동고 맞춤 기획·추가 개발: 일산동고 최진영 · AI 제작 보조
+학교 교표는 이전 대화에서 사용자가 제공한 원본 이미지를 그대로 사용했습니다.
+응원 삽화는 built-in Imagegen으로 생성했습니다.
+프롬프트: 남녀 한국 고등학생과 편지를 든 클로버 친구, 남색·크림·초록·작은 빨강 포인트의 따뜻한 손그림, 투명 배경, 글자·교표 없음.
