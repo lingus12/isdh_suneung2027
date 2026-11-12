@@ -1206,6 +1206,10 @@ noscript p {
       </div>
 
       <p class="footnote">
+        아직 보지 않은 편지부터 무작위로 보여드려요.<br>
+        본 편지는 이 브라우저에서만 기억하며, 이미 본 편지도 계속 읽을 수 있어요.
+      </p>
+      <p class="footnote">
         담당 선생님이 확인한 편지만 표시됩니다.
         체크한 편지는 Google 게시 갱신까지 보통 5~10분이 걸릴 수 있어요.
       </p>
@@ -1479,6 +1483,160 @@ noscript p {
   const sheet = safeURL(cfg.sheet, 'sheet');
   const form = safeURL(cfg.form, 'form');
 
+  /* 노출 기록은 원문 대신 지문만 현재 브라우저에 저장합니다. */
+  function fingerprint(value) {
+    let a = 0xdeadbeef, b = 0x41c6ce57;
+    for (let i = 0; i < value.length; i++) {
+      const code = value.charCodeAt(i);
+      a = Math.imul(a ^ code, 2654435761);
+      b = Math.imul(b ^ code, 1597334677);
+    }
+    a = Math.imul(a ^ (a >>> 16), 2246822507) ^
+        Math.imul(b ^ (b >>> 13), 3266489909);
+    b = Math.imul(b ^ (b >>> 16), 2246822507) ^
+        Math.imul(a ^ (a >>> 13), 3266489909);
+    return (a >>> 0).toString(36) + '-' + (b >>> 0).toString(36);
+  }
+
+  function letterId(row) {
+    return fingerprint(JSON.stringify(
+      [row.type, row.group, row.from, row.text].map(value =>
+        value.replace(/\r\n?/g, '\n')
+      )
+    ));
+  }
+
+  const HISTORY_KEY = 'isdh2027-seen-v1-' + fingerprint(sheet);
+  const seenIds = new Set();
+  const expandedIds = new Set();
+  try {
+    const saved = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    if (Array.isArray(saved)) {
+      saved.slice(-5000).forEach(id => {
+        if (typeof id === 'string' && /^[a-z0-9]+-[a-z0-9]+$/.test(id)) {
+          seenIds.add(id);
+        }
+      });
+    }
+  } catch { /* 저장이 제한된 환경에서는 현재 방문 동안만 기억합니다. */ }
+
+  function markSeen(id) {
+    if (seenIds.has(id)) return;
+    seenIds.add(id);
+    while (seenIds.size > 5000) seenIds.delete(seenIds.values().next().value);
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify([...seenIds]));
+    } catch { /* 편지 열람은 저장 성공 여부와 관계없이 계속합니다. */ }
+  }
+
+  function shuffle(rows) {
+    const result = rows.slice();
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+
+  function arrangeRows(rows, reshuffle) {
+    const keyed = rows.map(row => ({ ...row, id: letterId(row) }));
+    if (reshuffle) {
+      return {
+        rows: shuffle(keyed.filter(row => !seenIds.has(row.id))).concat(
+          shuffle(keyed.filter(row => seenIds.has(row.id)))
+        ),
+        added: keyed.length
+      };
+    }
+    // 자동 확인에서는 기존 순서를 유지하고 승인 해제된 편지는 제거합니다.
+    const buckets = new Map();
+    keyed.forEach(row => {
+      if (!buckets.has(row.id)) buckets.set(row.id, []);
+      buckets.get(row.id).push(row);
+    });
+    const kept = [];
+    state.rows.forEach(row => {
+      const bucket = buckets.get(row.id);
+      if (bucket && bucket.length) kept.push(bucket.shift());
+    });
+    const added = shuffle([...buckets.values()].flat());
+    return { rows: added.concat(kept), added: added.length };
+  }
+
+  let cardObserver;
+  const exposure = new Map();
+
+  function stopWatchingCards() {
+    if (cardObserver) cardObserver.disconnect();
+    exposure.forEach(item => clearTimeout(item.timer));
+    exposure.clear();
+  }
+
+  function watchCards() {
+    stopWatchingCards();
+    if (document.hidden || !('IntersectionObserver' in window)) return;
+    const inset = Math.ceil($('.mobile-nav')?.getBoundingClientRect().height || 0);
+    cardObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const card = entry.target;
+        const id = card.dataset.letterId;
+        const item = exposure.get(card) || { ratio: 0, timer: null };
+        item.ratio = entry.intersectionRatio;
+        exposure.set(card, item);
+        if (!entry.isIntersecting || item.ratio < 0.5 || document.hidden) {
+          clearTimeout(item.timer);
+          item.timer = null;
+          return;
+        }
+        if (seenIds.has(id)) {
+          cardObserver.unobserve(card);
+          return;
+        }
+        if (item.timer !== null) return;
+        item.timer = setTimeout(() => {
+          item.timer = null;
+          if (!document.hidden && card.isConnected && item.ratio >= 0.5) {
+            markSeen(id);
+            cardObserver.unobserve(card);
+          }
+        }, 1000);
+      });
+    }, { threshold: [0, 0.5], rootMargin: '0px 0px -' + inset + 'px 0px' });
+    $$('#letters .card').forEach(card => {
+      if (!seenIds.has(card.dataset.letterId)) cardObserver.observe(card);
+    });
+  }
+
+  function readingAnchor() {
+    const bottom = window.innerHeight -
+      ($('.mobile-nav')?.getBoundingClientRect().height || 0);
+    const cards = $$('#letters .card');
+    const index = cards.findIndex(node => {
+      const box = node.getBoundingClientRect();
+      return box.bottom > 0 && box.top < bottom;
+    });
+    const card = cards[index];
+    return card ? {
+      id: card.dataset.letterId,
+      occurrence: cards.slice(0, index).filter(node =>
+        node.dataset.letterId === card.dataset.letterId
+      ).length,
+      top: card.getBoundingClientRect().top
+    } : null;
+  }
+
+  function restoreAnchor(anchor) {
+    if (!anchor) return;
+    const card = $$('#letters .card').filter(node =>
+      node.dataset.letterId === anchor.id
+    )[anchor.occurrence];
+    if (card) {
+      const difference = card.getBoundingClientRect().top - anchor.top;
+      if (difference) window.scrollBy({ top: difference, behavior: 'instant' });
+    }
+  }
+
+
   let toastTimer;
 
   function toast(message) {
@@ -1665,7 +1823,9 @@ noscript p {
   }
 
   function makeCard(row, index) {
-    const card = el('article', 'card ' + row.group);
+    const expanded = expandedIds.has(row.id);
+    const card = el('article', 'card ' + row.group + (expanded ? ' expanded' : ''));
+    card.dataset.letterId = row.id;
     const top = el('div', 'card-top');
 
     top.append(
@@ -1681,10 +1841,10 @@ noscript p {
     body.id = 'letter-body-' + index;
 
     const bottom = el('div', 'card-bottom');
-    const button = el('button', 'text-btn', '편지 펼치기 ↗');
+    const button = el('button', 'text-btn', expanded ? '접기 ↑' : '편지 펼치기 ↗');
 
     button.type = 'button';
-    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-expanded', String(expanded));
     button.setAttribute('aria-controls', body.id);
 
     button.addEventListener('click', () => {
@@ -1692,6 +1852,12 @@ noscript p {
 
       button.setAttribute('aria-expanded', String(expanded));
       button.textContent = expanded ? '접기 ↑' : '편지 펼치기 ↗';
+      if (expanded) {
+        expandedIds.add(row.id);
+        markSeen(row.id);
+      } else {
+        expandedIds.delete(row.id);
+      }
     });
 
     bottom.append(
@@ -1704,7 +1870,9 @@ noscript p {
     return card;
   }
 
-  function render() {
+  function render({ preservePosition = false } = {}) {
+    const anchor = preservePosition ? readingAnchor() : null;
+    stopWatchingCards();
     const locked = isLocked();
 
     $$('.tab').forEach(button => {
@@ -1804,6 +1972,9 @@ noscript p {
       ' / ' +
       list.length +
       ') ↓';
+
+    restoreAnchor(anchor);
+    watchCards();
   }
 
   function status(text, error = false) {
@@ -1812,8 +1983,9 @@ noscript p {
   }
 
   /* 공개용 CSV만 읽습니다. 시트 수정이나 설문 제출은 하지 않습니다. */
-  async function load() {
+  async function load(reshuffle = false) {
     if (state.busy) return;
+    let shouldRender = reshuffle || !state.loaded;
 
     state.lastAttempt = Date.now();
 
@@ -1857,7 +2029,17 @@ noscript p {
 
       const data = decode(await response.text());
 
-      state.rows = data.rows;
+      const ordered = arrangeRows(data.rows, reshuffle || !state.loaded);
+      const changed = ordered.rows.length !== state.rows.length ||
+        ordered.rows.some((row, index) => row.id !== state.rows[index]?.id);
+      shouldRender = shouldRender || changed;
+      if (reshuffle) state.limit = 12;
+      else if (state.loaded && ordered.added) state.limit += ordered.added;
+      state.rows = ordered.rows;
+      const currentIds = new Set(state.rows.map(row => row.id));
+      expandedIds.forEach(id => {
+        if (!currentIds.has(id)) expandedIds.delete(id);
+      });
       state.loaded = true;
       state.error = '';
 
@@ -1887,6 +2069,7 @@ noscript p {
        */
       state.rows = [];
       state.loaded = false;
+      shouldRender = true;
 
       if (error.name === 'AbortError') {
         state.error =
@@ -1906,7 +2089,7 @@ noscript p {
       clearTimeout(timeout);
       state.busy = false;
       $('#refresh').disabled = false;
-      render();
+      if (shouldRender) render({ preservePosition: !reshuffle });
     }
   }
 
@@ -1935,7 +2118,7 @@ noscript p {
     render();
   });
 
-  $('#refresh').addEventListener('click', load);
+  $('#refresh').addEventListener('click', () => load(true));
 
   $('#more').addEventListener('click', () => {
     state.limit += 12;
@@ -1948,7 +2131,12 @@ noscript p {
 
     if (!list.length) return;
 
-    const index = Math.floor(Math.random() * list.length);
+    const unseen = list.filter(row => !seenIds.has(row.id));
+    const choices = unseen.length ? unseen : list;
+    const chosen = choices[Math.floor(Math.random() * choices.length)];
+    const index = list.indexOf(chosen);
+    expandedIds.add(chosen.id);
+    markSeen(chosen.id);
 
     state.limit = Math.max(state.limit, index + 1);
     render();
@@ -2077,6 +2265,8 @@ noscript p {
 
   /* 화면에 돌아오면 시간과 데이터를 다시 확인 */
   document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopWatchingCards();
+    else watchCards();
     if (!document.hidden) {
       clock();
 
@@ -2084,6 +2274,12 @@ noscript p {
         load();
       }
     }
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(watchCards, 150);
   });
 
   /* 페이지가 보일 때만 1분마다 새 편지를 확인 */
