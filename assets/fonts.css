@@ -1,0 +1,59 @@
+/*
+ * KoPubWorld is used only when already installed on the visitor's device.
+ * No KoPubWorld font files are redistributed or fetched by this stylesheet.
+ *
+ * Paperlogy source: https://github.com/Freesentation/paperlogy
+ * Pinned upstream commit: 8ef35f53b318c7ca914c52b1b382b9a8bad07a61
+ * Copyright 2024 The PAPERLOGY Authors (https://freesentation.blog/paperlogy)
+ * SIL Open Font License 1.1: fonts/OFL-Paperlogy.txt
+ */
+@font-face {
+  font-family: "KoPubWorld Local";
+  src: local("KoPubWorldDotum Medium"), local("KoPubWorldDotum-Medium"),
+       local("KoPubWorldDotum_Pro Medium"), local("KoPubWorldDotum_Pro-Medium"),
+       local("KoPubWorld돋움체 Medium"), local("KoPubWorld돋움체_Pro Medium");
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "KoPubWorld Local";
+  src: local("KoPubWorldDotum Bold"), local("KoPubWorldDotum-Bold"),
+       local("KoPubWorldDotum_Pro Bold"), local("KoPubWorldDotum_Pro-Bold"),
+       local("KoPubWorld돋움체 Bold"), local("KoPubWorld돋움체_Pro Bold");
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Paperlogy";
+  src: url("fonts/Paperlogy-4Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Paperlogy";
+  src: url("fonts/Paperlogy-6SemiBold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Paperlogy";
+  src: url("fonts/Paperlogy-7Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+}
+
+:root {
+  --font-body: "KoPubWorld Local", "Paperlogy", -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-display: "Paperlogy", "KoPubWorld Local", -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
