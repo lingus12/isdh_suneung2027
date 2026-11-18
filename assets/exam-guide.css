@@ -3,3 +3,39 @@
 .back{min-height:56px;padding:12px 24px;border:1px solid #002f82;border-radius:12px;background:#002f82;color:#fff;font-size:20px;font-weight:700;line-height:1.5;justify-content:center;text-align:center;box-shadow:0 3px 9px #002f8214}
 .back:hover{background:#164b98}
 @media(max-width:750px){.header-inner{flex-wrap:wrap;justify-content:flex-start;padding:14px 0;gap:12px}.back{width:100%;min-height:52px;padding:12px 16px;font-size:18px}}
+
+/* 2026.11.18 교육부 긴급 추가 안내를 첫 화면에 강조합니다. */
+.hero{padding-top:30px;padding-bottom:24px}
+.hero h1{font-size:clamp(32px,4.1vw,45px)}
+.security-update{border:2px solid #a52d20;border-top:8px solid #a52d20;border-radius:18px;background:#fff3eb;padding:28px;margin-bottom:26px;scroll-margin-top:24px;overflow-wrap:anywhere}
+.update-badge{display:inline-block;background:#a52d20;color:#fff;border-radius:7px;padding:5px 12px;font-size:13px;font-weight:700;letter-spacing:.3px}
+.security-update h2{font-size:clamp(27px,3.6vw,37px);line-height:1.5;letter-spacing:-1px;margin:15px 0 9px;color:#7e241b}
+.security-update h2 strong{color:#a52d20;text-decoration:underline;text-decoration-color:#dca36c;text-underline-offset:6px;text-decoration-thickness:3px}
+.update-intro{font-size:16px;color:#563e35}
+.update-points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:23px}
+.update-points article{min-width:0;background:#fffdf9;border:1px solid #e2c4b4;border-radius:12px;padding:20px}
+.update-step{font-size:12px;font-weight:700;letter-spacing:.7px;color:#93502e}
+.update-points h3{font-size:19px;line-height:1.65;color:#002f82;margin:8px 0 10px}
+.update-points article>p:last-child{font-size:14px;line-height:1.9;color:#4d4d4d}
+.inspection-heading{margin-top:26px}
+.inspection-heading h3{font-size:22px;line-height:1.6;color:#7e241b}
+.inspection-heading p{font-size:14px;color:#6a5144}
+.inspection-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0;list-style:none;margin:14px 0 0}
+.inspection-list li{min-width:0;border:1px solid #e5cbbb;border-radius:10px;padding:15px 18px;background:#fffdf9}
+.inspection-list strong{display:block;font-size:16px;color:#002f82;margin-bottom:4px}
+.inspection-list span{display:block;font-size:14px;line-height:1.85}
+.inspection-list .recommended{background:#fff7d9;border-color:#e0cc8c}
+.device-reminder{font-size:15px;line-height:1.9;background:#fff;border-left:4px solid #a52d20;border-radius:6px;padding:16px 18px;margin-top:20px}
+.device-reminder>strong{color:#9a271d;display:block}
+.device-reminder a{display:inline-block;color:#002f82;font-weight:600;text-underline-offset:4px}
+.update-links{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;margin-top:20px}
+.update-links .btn{background:#a52d20;border-color:#a52d20}
+.update-links .btn:hover{background:#842116}
+.update-links>a:not(.btn){font-size:14px;color:#002f82;min-height:44px;display:inline-flex;align-items:center;text-underline-offset:4px}
+.update-source{font-size:12px;color:#745c50;line-height:1.9;margin-top:16px}
+.jump .latest-jump{background:#a52d20;color:#fff;border-color:#a52d20}
+.materials-update-note{border:1px solid #e0bc97;border-left:4px solid #a52d20;background:#fff4e5;border-radius:10px;padding:16px 19px;font-size:15px;line-height:1.9;margin-bottom:20px}
+.materials-update-note strong{color:#8d271c}
+.materials-update-note a{color:#002f82;text-underline-offset:4px}
+@media(max-width:800px){.update-points{grid-template-columns:1fr}.update-points h3 br{display:none}.update-points article{padding:18px}.security-update{padding:23px}}
+@media(max-width:600px){.hero{padding-top:22px;padding-bottom:20px}.hero h1{font-size:32px}.security-update{padding:20px 17px;border-radius:13px;margin-bottom:22px}.update-badge{font-size:12px;padding:5px 9px}.security-update h2{font-size:27px;letter-spacing:-.7px;margin-top:13px}.update-intro{font-size:15px}.update-points{margin-top:18px;gap:12px}.update-points h3{font-size:18px}.inspection-heading h3{font-size:21px}.inspection-list{grid-template-columns:1fr}.inspection-list li{padding:14px 16px}.device-reminder{font-size:14px;padding:15px}.update-links{display:block}.update-links .btn{width:100%;font-size:14px}.update-links>a:not(.btn){margin-top:9px}.materials-update-note{font-size:14px;padding:15px 17px}.update-source{font-size:12px}}
